@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>高新技术企业成长性分析</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230F2A5C'/%3E%3Cpath d='M7 22l6-8 4 4 8-11' stroke='%2306B6D4' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M21 7h6v6' stroke='%2306B6D4' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+<style>
+:root{
+  --navy:#0B1B33; --navy-2:#102A54; --blue:#2563EB; --cyan:#06B6D4;
+  --green:#10B981; --red:#EF4444; --amber:#F59E0B;
+  --ink:#0F172A; --sub:#64748B; --line:#E2E8F0; --bg:#F3F6FB; --card:#FFFFFF;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  background:var(--bg); color:var(--ink); line-height:1.6;
+  font-variant-numeric:tabular-nums;
+}
+.wrap{max-width:1180px;margin:0 auto;padding:0 22px}
+
+/* ===== 顶部 ===== */
+.hero{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-2) 60%,#0E3A66 100%);color:#fff;padding:44px 0 40px}
+.hero .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:13px;letter-spacing:.14em;color:#7DD3FC;font-weight:500}
+.hero .eyebrow::before{content:"";width:22px;height:2px;background:var(--cyan);border-radius:2px}
+.hero h1{font-size:34px;font-weight:900;margin:12px 0 10px;letter-spacing:.02em}
+.hero .sub{font-size:14px;color:#B6C6E2;display:flex;flex-wrap:wrap;gap:8px 22px}
+.hero .sub b{color:#E6EEFF;font-weight:500}
+.hero-grid{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap}
+.verdict{display:flex;gap:12px;margin-top:22px;flex-wrap:wrap}
+.verdict .item{
+  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);
+  border-radius:10px;padding:10px 16px;min-width:150px;backdrop-filter:blur(4px)
+}
+.verdict .item .t{font-size:12px;color:#9FB4D8}
+.verdict .item .v{font-size:16px;font-weight:700;margin-top:2px;display:flex;align-items:center;gap:6px}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.dot.good{background:var(--green);box-shadow:0 0 8px rgba(16,185,129,.8)}
+.dot.warn{background:var(--amber);box-shadow:0 0 8px rgba(245,158,11,.8)}
+.dot.bad{background:var(--red);box-shadow:0 0 8px rgba(239,68,68,.8)}
+
+main{padding:26px 0 10px}
+
+/* ===== KPI 卡 ===== */
+.kpi-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-bottom:22px}
+.kpi{
+  background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 16px 14px;
+  position:relative;overflow:hidden
+}
+.kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--blue)}
+.kpi.k-cyan::before{background:var(--cyan)}
+.kpi.k-red::before{background:var(--red)}
+.kpi.k-green::before{background:var(--green)}
+.kpi.k-amber::before{background:var(--amber)}
+.kpi .label{font-size:12px;color:var(--sub)}
+.kpi .val{font-size:24px;font-weight:900;margin:4px 0 2px;letter-spacing:-.01em}
+.kpi .val small{font-size:13px;font-weight:500;color:var(--sub);margin-left:3px}
+.kpi .delta{font-size:12px;display:flex;align-items:center;gap:4px}
+.kpi .delta.up{color:var(--green)}
+.kpi .delta.down{color:var(--red)}
+.kpi .delta.flat{color:var(--sub)}
+.arrow{font-size:11px}
+
+/* ===== 面板 ===== */
+.panel{background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:22px;padding:22px 24px 24px}
+.panel-head{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.panel-head .t{font-size:17px;font-weight:700}
+.panel-head .tag{font-size:11px;color:var(--blue);background:#EAF2FF;border:1px solid #C9DEFF;border-radius:20px;padding:1px 10px;font-weight:500}
+.panel-desc{font-size:13px;color:var(--sub);margin-bottom:16px}
+
+/* ===== 表格 ===== */
+.table-scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;table-layout:fixed;min-width:640px}
+colgroup col.c-year{width:14%}
+colgroup col.c-num{width:24%}
+caption{caption-side:bottom;text-align:left;font-size:12px;color:var(--sub);padding-top:10px}
+th{background:#F8FAFE;font-size:13px;font-weight:700;color:#334155;padding:12px 14px;border:1px solid var(--line);text-align:center}
+th .hint{display:inline-flex;align-items:center;gap:5px;cursor:help;color:var(--sub);font-weight:400;font-size:11px;margin-top:2px}
+th .hint:hover{color:var(--blue)}
+.hint-ic{width:15px;height:15px;border:1px solid #94A3B8;border-radius:50%;font-size:10px;line-height:13px;text-align:center;font-style:normal;color:#64748B;display:inline-block}
+td{padding:11px 14px;border:1px solid var(--line);text-align:center;font-size:14px}
+td.rowlabel{font-weight:500;color:#334155}
+td.neg{color:var(--red);font-weight:600}
+td.pos{color:var(--green);font-weight:600}
+td .warn-ic{
+  display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;border-radius:50%;
+  background:var(--red);color:#fff;font-size:12px;font-weight:700;margin-left:6px;cursor:help;vertical-align:1px
+}
+tr.sum td{background:#F8FAFE;font-weight:700}
+tr.sum td.label{color:#334155}
+
+/* tooltip */
+.tip{position:fixed;z-index:99;background:#0F172A;color:#F1F5F9;font-size:12px;line-height:1.7;
+  padding:10px 12px;border-radius:8px;max-width:270px;box-shadow:0 8px 24px rgba(15,23,42,.25);display:none;pointer-events:none}
+
+/* ===== 图表 ===== */
+.charts{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.chart-card{border:1px solid var(--line);border-radius:10px;padding:14px 14px 6px}
+.chart-card h3{font-size:14px;font-weight:700;margin-bottom:2px}
+.chart-card p{font-size:12px;color:var(--sub);margin-bottom:8px}
+.chart{width:100%;height:250px}
+
+/* ===== 解读 ===== */
+.insight-list{display:flex;flex-direction:column;gap:12px}
+.insight{
+  display:flex;gap:14px;padding:14px 16px;border:1px solid var(--line);border-radius:10px;background:#FBFCFE
+}
+.insight .idx{
+  flex:none;width:26px;height:26px;border-radius:8px;background:var(--navy);color:#fff;
+  font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:2px
+}
+.insight .body{font-size:14px}
+.insight .body b{font-weight:700}
+.insight .body .hl-blue{color:var(--blue);font-weight:700}
+.insight .body .hl-red{color:var(--red);font-weight:700}
+.insight .body .hl-green{color:var(--green);font-weight:700}
+.insight.verdict-bg{background:linear-gradient(90deg,#F0F7FF,#EFFCF9);border-color:#BFDCFE}
+
+/* ===== 页脚 ===== */
+footer{padding:8px 0 40px}
+.foot-note{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 24px;font-size:13px;color:var(--sub)}
+.foot-note h4{font-size:14px;color:#334155;margin-bottom:8px}
+.foot-note ul{padding-left:18px}
+.foot-note li{margin:3px 0}
+
+@media (max-width:1024px){
+  .kpi-grid{grid-template-columns:repeat(3,1fr)}
+  .charts{grid-template-columns:1fr}
+  .chart{height:280px}
+}
+@media (max-width:640px){
+  .wrap{padding:0 14px}
+  .hero{padding:32px 0 28px}
+  .hero h1{font-size:26px}
+  .kpi-grid{grid-template-columns:repeat(2,1fr);gap:10px}
+  .kpi .val{font-size:20px}
+  .panel{padding:16px 14px}
+  .verdict .item{min-width:130px;flex:1}
+
+  /* 移动端表格改为堆叠卡片 */
+  .table-scroll{overflow:visible}
+  table{min-width:0}
+  thead{display:none}
+  tbody, tr{display:block}
+  tr{border:1px solid var(--line);border-radius:10px;margin-bottom:10px;overflow:hidden}
+  tr.sum{background:var(--card)}
+  td{display:flex;justify-content:space-between;align-items:center;gap:10px;border:none;
+    border-bottom:1px dashed var(--line);text-align:right;padding:9px 12px}
+  td:last-child{border-bottom:none}
+  td::before{content:attr(data-label);color:var(--sub);font-size:12px;text-align:left;flex:none}
+  td.rowlabel::before, td.label::before{font-weight:400}
+  td.rowlabel, td.label{font-weight:700;color:var(--ink);background:#F8FAFE}
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow">高新技术企业认定 · 成长性分析</span>
+      <h1>企业成长性分析</h1>
+      <div class="sub">
+        <span>申报主体：<b>示例企业有限公司</b>（示例数据）</span>
+        <span>统计区间：<b>第 1 年 — 第 3 年</b></span>
+        <span>指标口径：<b>企业成长性情况表</b></span>
+      </div>
+    </div>
+    <div class="verdict">
+      <div class="item"><div class="t">收入成长性</div><div class="v"><span class="dot good"></span>良好</div></div>
+      <div class="item"><div class="t">盈利能力</div><div class="v"><span class="dot bad"></span>待改善</div></div>
+      <div class="item"><div class="t">净资产质量</div><div class="v"><span class="dot bad"></span>风险</div></div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ===== KPI ===== -->
+  <section class="kpi-grid">
+    <div class="kpi k-cyan">
+      <div class="label">销售收入（第3年）</div>
+      <div class="val">1,862.87<small>万元</small></div>
+      <div class="delta up"><span class="arrow">▲</span>较上年 +16.75%</div>
+    </div>
+    <div class="kpi">
+      <div class="label">销售收入年均增长率</div>
+      <div class="val">58.06<small>%</small></div>
+      <div class="delta up"><span class="arrow">▲</span>三年累计 +132.77%</div>
+    </div>
+    <div class="kpi k-green">
+      <div class="label">利润总额（第3年）</div>
+      <div class="val">-84.68<small>万元</small></div>
+      <div class="delta up"><span class="arrow">▲</span>亏损较上年收窄 37.30%</div>
+    </div>
+    <div class="kpi k-red">
+      <div class="label">净资产（第3年）</div>
+      <div class="val">-128.94<small>万元</small></div>
+      <div class="delta down"><span class="arrow">▼</span>较上年下降 157.60%</div>
+    </div>
+    <div class="kpi k-red">
+      <div class="label">年平均利润率</div>
+      <div class="val">-5.83<small>%</small></div>
+      <div class="delta down">三年累计亏损 248.70 万元</div>
+    </div>
+    <div class="kpi k-amber">
+      <div class="label">净资产增长率（系统口径）</div>
+      <div class="val">0.00<small>%</small></div>
+      <div class="delta flat">期末净资产为负</div>
+    </div>
+  </section>
+
+  <!-- ===== 数据表 ===== -->
+  <section class="panel">
+    <div class="panel-head"><span class="t">核心数据表</span><span class="tag">企业成长性情况</span></div>
+    <div class="panel-desc">与认定系统《企业成长性情况》表一致，红色感叹号为系统提示项，悬停可查看说明。</div>
+    <div class="table-scroll">
+      <table>
+        <colgroup>
+          <col class="c-year"><col class="c-num"><col class="c-num"><col class="c-num">
+        </colgroup>
+        <thead>
+          <tr>
+            <th>年度
+              <div class="hint" data-tip="统计区间为第1年至第3年，对应企业认定前三个完整会计年度。"><i class="hint-ic">i</i><span>[提示内容]</span></div>
+            </th>
+            <th>净资产（万元）
+              <div class="hint" data-tip="净资产＝资产总额－负债总额。出现负值提示企业资不抵债，认定时需结合持续经营能力判断。"><i class="hint-ic">i</i><span>[提示内容]</span></div>
+            </th>
+            <th>销售收入（万元）
+              <div class="hint" data-tip="销售收入为认定口径主营业务收入。系统对收入增长的合理性进行复核，需提供佐证材料。"><i class="hint-ic">i</i><span>[提示内容]</span></div>
+            </th>
+            <th>利润总额（万元）
+              <div class="hint" data-tip="利润总额为会计利润口径。连续为负说明主业盈利能力不足，需结合成本费用分析。"><i class="hint-ic">i</i><span>[提示内容]</span></div>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="rowlabel" data-label="年度">第1年</td>
+            <td class="pos" data-label="净资产（万元）">77.32</td>
+            <td data-label="销售收入（万元）">800.32<span class="warn-ic" data-tip="该指标触发系统提示项，请核对填报口径与佐证材料。">!</span></td>
+            <td class="neg" data-label="利润总额（万元）">-28.95</td>
+          </tr>
+          <tr>
+            <td class="rowlabel" data-label="年度">第2年</td>
+            <td class="neg" data-label="净资产（万元）">-50.05</td>
+            <td data-label="销售收入（万元）">1,595.61<span class="warn-ic" data-tip="该指标触发系统提示项，请核对填报口径与佐证材料。">!</span></td>
+            <td class="neg" data-label="利润总额（万元）">-135.07</td>
+          </tr>
+          <tr>
+            <td class="rowlabel" data-label="年度">第3年</td>
+            <td class="neg" data-label="净资产（万元）">-128.94</td>
+            <td data-label="销售收入（万元）">1,862.87<span class="warn-ic" data-tip="该指标触发系统提示项，请核对填报口径与佐证材料。">!</span></td>
+            <td class="neg" data-label="利润总额（万元）">-84.68</td>
+          </tr>
+          <tr class="sum">
+            <td class="label" data-label="年度">增长率 / 利润率</td>
+            <td data-label="净资产（万元）">0.00<small>%</small></td>
+            <td data-label="销售收入（万元）">58.06<small>%</small></td>
+            <td data-label="利润总额（万元）">-5.83<small>%（年平均利润率）</small></td>
+          </tr>
+        </tbody>
+        <caption>注：净资产增长率、销售收入增长率、年平均利润率按认定系统统计口径展示；销售收入增长率＝各年度同比增长率的算术平均。</caption>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===== 图表 ===== -->
+  <section class="panel">
+    <div class="panel-head"><span class="t">成长趋势可视化</span><span class="tag">三年财务走势</span></div>
+    <div class="panel-desc">销售收入逐年攀升，但净资产持续转负、利润总额常年亏损，呈现"增收不增利"特征。</div>
+    <div class="charts">
+      <div class="chart-card">
+        <h3>销售收入走势</h3>
+        <p>单位：万元，柱顶标注同比增速</p>
+        <div class="chart" id="chartSales"></div>
+      </div>
+      <div class="chart-card">
+        <h3>净资产变动</h3>
+        <p>单位：万元，绿色为正、红色为负</p>
+        <div class="chart" id="chartAsset"></div>
+      </div>
+      <div class="chart-card">
+        <h3>年度利润率</h3>
+        <p>利润总额 ÷ 销售收入，单位：%</p>
+        <div class="chart" id="chartMargin"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 解读 ===== -->
+  <section class="panel">
+    <div class="panel-head"><span class="t">成长性解读</span><span class="tag">指标逐项分析</span></div>
+    <div class="panel-desc">按认定关注的核心指标逐项解读，供申报材料与合理性说明参考。</div>
+    <div class="insight-list">
+      <div class="insight">
+        <div class="idx">1</div>
+        <div class="body"><b>销售收入：</b>三年由 <span class="hl-blue">800.32</span> 万元增至 <span class="hl-blue">1,862.87</span> 万元，累计增长 <span class="hl-blue">132.77%</span>，年均增长率 <span class="hl-blue">58.06%</span>，收入端成长性突出，是本次申报的加分项。</div>
+      </div>
+      <div class="insight">
+        <div class="idx">2</div>
+        <div class="body"><b>收入增速：</b>第2年同比增长 <span class="hl-blue">99.37%</span>，第3年回落至 <span class="hl-blue">16.75%</span>，高增长后明显放缓，需说明增长驱动因素及市场扩张的可持续性。</div>
+      </div>
+      <div class="insight">
+        <div class="idx">3</div>
+        <div class="body"><b>净资产：</b>由 <span class="hl-red">77.32</span> 万元持续下降至 <span class="hl-red">-128.94</span> 万元，连续两年为负，净资产增长率（系统口径）为 0.00%，存在资不抵债风险。</div>
+      </div>
+      <div class="insight">
+        <div class="idx">4</div>
+        <div class="body"><b>利润总额：</b>三年分别为 <span class="hl-red">-28.95 / -135.07 / -84.68</span> 万元，累计亏损 <span class="hl-red">248.70</span> 万元；第3年亏损较上年收窄 <span class="hl-green">37.30%</span>，但仍未实现盈利。</div>
+      </div>
+      <div class="insight">
+        <div class="idx">5</div>
+        <div class="body"><b>年平均利润率：</b>为 <span class="hl-red">-5.83%</span>（利润总额合计 ÷ 销售收入合计），收入增长尚未转化为利润，成本费用管控是扭亏的关键。</div>
+      </div>
+      <div class="insight verdict-bg">
+        <div class="idx">6</div>
+        <div class="body"><b>综合评价：</b>企业收入端成长性良好，满足"销售收入持续增长"的成长性要求；但净资产转负、持续亏损构成重大风险点，申报时需准备充分的合理性说明、审计意见及未来盈利预测等佐证材料。</div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="wrap">
+  <div class="foot-note">
+    <h4>数据说明</h4>
+    <ul>
+      <li>数据来源：《企业成长性情况》表（示例数据，仅用于页面展示，不代表真实企业）。</li>
+      <li>口径说明：净资产增长率、销售收入增长率、年平均利润率均按认定系统统计口径展示；销售收入增长率＝第2、3年同比增速的算术平均。</li>
+      <li>本页为分析展示页，不构成高新技术企业认定的最终结论。</li>
+    </ul>
+  </div>
+</footer>
+
+<div class="tip" id="tip"></div>
+
+<script>
+/* ===== 工具提示 ===== */
+(function(){
+  var tip = document.getElementById('tip');
+  function show(e){
+    var t = e.currentTarget.getAttribute('data-tip');
+    if(!t) return;
+    tip.textContent = t;
+    tip.style.display = 'block';
+    var r = e.currentTarget.getBoundingClientRect();
+    var tw = tip.offsetWidth, th = tip.offsetHeight;
+    var x = Math.min(Math.max(8, r.left + r.width/2 - tw/2), window.innerWidth - tw - 8);
+    var y = r.top - th - 10;
+    if(y < 8){ y = r.bottom + 10; }
+    tip.style.left = x + 'px'; tip.style.top = y + 'px';
+  }
+  function hide(){ tip.style.display = 'none'; }
+  document.querySelectorAll('[data-tip]').forEach(function(el){
+    el.addEventListener('mouseenter', show);
+    el.addEventListener('mouseleave', hide);
+    el.addEventListener('focus', show);
+    el.addEventListener('blur', hide);
+  });
+})();
+
+/* ===== 图表 ===== */
+var YEARS = ['第1年','第2年','第3年'];
+var AXIS = {
+  axisLine:{lineStyle:{color:'#CBD5E1'}},
+  axisLabel:{color:'#64748B', fontSize:12},
+  splitLine:{lineStyle:{color:'#EEF2F7'}}
+};
+var COMMON = {
+  grid:{left:10,right:16,top:34,bottom:6,containLabel:true},
+  tooltip:{trigger:'axis',backgroundColor:'#0F172A',borderWidth:0,textStyle:{color:'#F1F5F9',fontSize:12}}
+};
+
+/* 图1 销售收入 */
+var salesChart = echarts.init(document.getElementById('chartSales'));
+salesChart.setOption(Object.assign({}, COMMON, {
+  xAxis:Object.assign({type:'category',data:YEARS,boundaryGap:true}, AXIS),
+  yAxis:Object.assign({type:'value',name:'万元',nameTextStyle:{color:'#94A3B8'}}, AXIS),
+  series:[{
+    name:'销售收入',type:'bar',data:[800.32,1595.61,1862.87],barWidth:44,
+    itemStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'#3B82F6'},{offset:1,color:'#2563EB'}]),borderRadius:[6,6,0,0]},
+    label:{
+      show:true,position:'top',color:'#0F172A',fontWeight:700,fontSize:12,
+      formatter:function(p){
+        var g = ['800.32','+99.37%','+16.75%'];
+        return p.dataIndex === 0 ? '800.32' : g[p.dataIndex-1] + '\n' + p.value.toLocaleString();
+      }
+    }
+  }]
+}));
+
+/* 图2 净资产 */
+var assetChart = echarts.init(document.getElementById('chartAsset'));
+assetChart.setOption(Object.assign({}, COMMON, {
+  xAxis:Object.assign({type:'category',data:YEARS,boundaryGap:true}, AXIS),
+  yAxis:Object.assign({type:'value',name:'万元',nameTextStyle:{color:'#94A3B8'}}, AXIS),
+  series:[{
+    name:'净资产',type:'bar',data:[77.32,-50.05,-128.94],barWidth:44,
+    itemStyle:{borderRadius:[6,6,0,0],color:function(p){
+      return p.value >= 0 ? '#10B981' : '#EF4444';
+    }},
+    label:{show:true,position:'top',color:'#0F172A',fontWeight:700,fontSize:12,formatter:function(p){return p.value.toLocaleString();}}
+  }]
+}));
+
+/* 图3 年度利润率 */
+var marginChart = echarts.init(document.getElementById('chartMargin'));
+marginChart.setOption(Object.assign({}, COMMON, {
+  xAxis:Object.assign({type:'category',data:YEARS,boundaryGap:true}, AXIS),
+  yAxis:Object.assign({type:'value',name:'%',nameTextStyle:{color:'#94A3B8'}}, AXIS),
+  series:[{
+    name:'年度利润率',type:'bar',data:[-3.62,-8.47,-4.55],barWidth:44,
+    itemStyle:{borderRadius:[6,6,0,0],color:'#EF4444'},
+    label:{show:true,position:'top',color:'#0F172A',fontWeight:700,fontSize:12,formatter:function(p){return p.value.toFixed(2) + '%';}}
+  }]
+}));
+
+window.addEventListener('resize', function(){
+  salesChart.resize(); assetChart.resize(); marginChart.resize();
+});
+</script>
+</body>
+</html>
